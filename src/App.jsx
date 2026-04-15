@@ -9,28 +9,33 @@ import ClinicalCases from './pages/ClinicalCases'
 import TeacherDashboard from './pages/TeacherDashboard'
 
 const ProtectedRoute = ({ children, role }) => {
-  const { user, profile, loading } = useAuth()
+  const { user, studentSession, isTeacher, role: userRole, loading } = useAuth()
 
   if (loading) return (
-    <div className="flex items-center justify-center min-h-screen bg-deep text-white">
+    <div className="flex items-center justify-center min-h-screen bg-[#0a0c10] text-white">
       <div className="animate-pulse">Cargando aplicación...</div>
     </div>
   )
   
-  if (!user) return <Navigate to="/login" />
+  // Grant access if there is a Supabase user or a student session
+  const hasSession = user || studentSession
   
-  if (role && profile?.rol !== role) return <Navigate to="/dashboard" />
+  if (!hasSession) return <Navigate to="/login" />
+  
+  // Specific role check (e.g., for teacher dashboard)
+  if (role && userRole !== role) return <Navigate to="/dashboard" />
   
   return children
 }
 
 const AppRoutes = () => {
-  const { user } = useAuth()
+  const { user, studentSession } = useAuth()
+  const isAuthenticated = user || studentSession
 
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         
         <Route path="/dashboard" element={
           <ProtectedRoute>

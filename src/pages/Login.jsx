@@ -142,14 +142,6 @@ const Login = () => {
                   {loading ? 'Iniciando...' : 'EMPEZAR EVALUACIÓN'}
                   {!loading && <ChevronRight className="group-hover:translate-x-1 transition-transform" size={20} />}
                 </button>
-                
-                <button 
-                  type="button"
-                  onClick={handleQuickPrueba}
-                  className="w-full py-3 text-sm text-accent-primary hover:text-white transition-colors flex items-center justify-center gap-2 border border-accent-primary/20 rounded-xl hover:bg-accent-primary/10"
-                >
-                  <Sparkles size={16} /> Entrar en modo de prueba rápido
-                </button>
               </div>
 
               <p className="text-center text-xs text-text-secondary mt-6">
