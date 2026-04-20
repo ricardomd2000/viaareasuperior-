@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Save, Download, FileImage, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react'
 
-// Mapeo seguro en caso de diferencias de espacio en el JSON extraido
-const RUBRIC_KEY_MAP = {
-  "GRUPO 1 ANATOMIA": "GRUPO 1 ",
-  "GRUPO 2 ANATOMIA": "GRUPO 2",
-  "GRUPO 3 ANATOMIA": "GRUPO 3 "
+// Mapeo dinámico para extraer la rúbrica correcta ignorando espacios extras
+const getRubricForGroup = (groupName, rubrics) => {
+  if (!groupName || Object.keys(rubrics).length === 0) return [];
+  if (groupName.includes("1")) return rubrics["GRUPO 1 "] || rubrics["GRUPO 1"] || Object.values(rubrics)[0] || [];
+  if (groupName.includes("2")) return rubrics["GRUPO 2"] || rubrics["GRUPO 2 "] || Object.values(rubrics)[1] || [];
+  if (groupName.includes("3")) return rubrics["GRUPO 3 "] || rubrics["GRUPO 3"] || Object.values(rubrics)[2] || [];
+  return [];
 }
 
 const GradingViaAerea = () => {
@@ -86,7 +88,7 @@ const GradingViaAerea = () => {
     document.body.removeChild(link)
   }
 
-  const activeRubric = rubrics[RUBRIC_KEY_MAP[selectedGroup]] || []
+  const activeRubric = getRubricForGroup(selectedGroup, rubrics)
   let currentTotalScore = 0
   Object.values(currentGrades).forEach(s => currentTotalScore += s)
 
@@ -150,33 +152,33 @@ const GradingViaAerea = () => {
                   </div>
                </div>
                
-               <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 pb-12">
+               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pb-12">
                  {indexData[selectedGroup].map((file) => (
-                   <div key={file} className="bg-black rounded-xl overflow-hidden border border-white/10 flex flex-col h-[500px] shadow-2xl hover:border-white/30 transition-colors group">
-                     <div className="p-3 bg-slate-800/80 text-xs text-text-secondary flex justify-between items-center backdrop-blur-sm border-b border-white/5">
-                       <span className="font-mono truncate mr-4 text-slate-300">{file}</span>
+                   <div key={file} className="bg-black rounded-xl overflow-hidden border border-white/10 flex flex-col aspect-square shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:border-accent-primary/50 transition-colors group">
+                     <div className="p-3 bg-slate-800/90 text-xs text-text-secondary flex justify-between items-center z-10 border-b border-white/5">
+                       <span className="font-mono truncate mr-2 text-slate-300">{file}</span>
                        <a 
                          href={`/evaluaciones/${selectedGroup}/${file}`} 
                          target="_blank" 
                          rel="noreferrer"
-                         className="text-accent-primary hover:bg-accent-primary/10 p-1.5 rounded-md flex items-center gap-1 transition-colors flex-shrink-0"
-                         title="Abrir en pestaña nueva"
+                         className="text-accent-primary hover:bg-accent-primary/10 px-2 py-1.5 rounded flex items-center gap-1 transition-colors flex-shrink-0 bg-black/40 border border-white/5 hover:border-accent-primary/30"
+                         title="Abrir en tamaño completo"
                        >
-                         Ver Grande <ExternalLink size={14}/>
+                         Ver <ExternalLink size={14}/>
                        </a>
                      </div>
-                     <div className="flex-1 overflow-hidden p-2 flex items-center justify-center bg-[#0a0c10]">
+                     <div className="flex-1 overflow-hidden relative flex items-center justify-center bg-[#050505]">
                        {file.toLowerCase().endsWith('.pdf') ? (
                           <iframe 
                             src={`/evaluaciones/${selectedGroup}/${file}`} 
-                            className="w-full h-full bg-white rounded-lg border border-white/5"
+                            className="w-full h-full bg-white absolute inset-0"
                             title={file}
                           />
                        ) : (
                           <img 
                             src={`/evaluaciones/${selectedGroup}/${file}`} 
                             alt={file}
-                            className="w-full h-full object-contain drop-shadow-2xl"
+                            className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
                           />
                        )}
                      </div>
