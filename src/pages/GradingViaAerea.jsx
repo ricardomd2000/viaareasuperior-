@@ -278,40 +278,52 @@ const GradingViaAerea = () => {
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 1)}
-                                   className={`p-2 border-r border-white/10 cursor-pointer align-top transition-all relative ${
-                                     isFull 
-                                     ? 'bg-green-600 text-white font-bold shadow-inner' 
-                                     : 'text-text-secondary hover:bg-slate-800'
-                                   }`}
+                                   style={{
+                                     backgroundColor: isFull ? '#22c55e' : 'transparent',
+                                     color: isFull ? 'white' : '#94a3b8',
+                                     cursor: 'pointer',
+                                     fontWeight: isFull ? 'bold' : 'normal',
+                                     border: isFull ? '2px solid white' : '1px solid rgba(255,255,255,0.05)',
+                                     padding: '12px 8px'
+                                   }}
+                                   className="align-top transition-all"
                                  >
                                    <div className="flex flex-col gap-1">
-                                     {isFull && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {isFull && <div style={{backgroundColor: 'rgba(255,255,255,0.3)', fontSize: '9px', padding: '2px 4px', borderRadius: '4px', width: 'fit-content', marginBottom: '4px'}}>✓ SELECCIONADO</div>}
                                      {item["Completo (1 pto.)"]}
                                    </div>
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 0.5)}
-                                   className={`p-2 border-r border-white/10 cursor-pointer align-top transition-all relative ${
-                                     isHalf 
-                                     ? 'bg-amber-500 text-white font-bold shadow-inner' 
-                                     : 'text-text-secondary hover:bg-slate-800'
-                                   }`}
+                                   style={{
+                                     backgroundColor: isHalf ? '#f59e0b' : 'transparent',
+                                     color: isHalf ? 'white' : '#94a3b8',
+                                     cursor: 'pointer',
+                                     fontWeight: isHalf ? 'bold' : 'normal',
+                                     border: isHalf ? '2px solid white' : '1px solid rgba(255,255,255,0.05)',
+                                     padding: '12px 8px'
+                                   }}
+                                   className="align-top transition-all"
                                  >
                                    <div className="flex flex-col gap-1">
-                                     {isHalf && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {isHalf && <div style={{backgroundColor: 'rgba(255,255,255,0.3)', fontSize: '9px', padding: '2px 4px', borderRadius: '4px', width: 'fit-content', marginBottom: '4px'}}>✓ SELECCIONADO</div>}
                                      {item["Faltan elementos (0.5 ptos.)"]}
                                    </div>
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 0)}
-                                   className={`p-2 cursor-pointer align-top transition-all relative ${
-                                     isZero 
-                                     ? 'bg-red-600 text-white font-bold shadow-inner' 
-                                     : 'text-text-secondary hover:bg-slate-800'
-                                   }`}
+                                   style={{
+                                     backgroundColor: isZero ? '#ef4444' : 'transparent',
+                                     color: isZero ? 'white' : '#94a3b8',
+                                     cursor: 'pointer',
+                                     fontWeight: isZero ? 'bold' : 'normal',
+                                     border: isZero ? '2px solid white' : '1px solid rgba(255,255,255,0.05)',
+                                     padding: '12px 8px'
+                                   }}
+                                   className="align-top transition-all"
                                  >
                                    <div className="flex flex-col gap-1">
-                                     {isZero && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {isZero && <div style={{backgroundColor: 'rgba(255,255,255,0.3)', fontSize: '9px', padding: '2px 4px', borderRadius: '4px', width: 'fit-content', marginBottom: '4px'}}>✓ SELECCIONADO</div>}
                                      {item["Incompleto (0 ptos.)"]}
                                    </div>
                                  </td>
