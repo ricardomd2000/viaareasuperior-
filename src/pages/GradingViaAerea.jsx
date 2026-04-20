@@ -58,6 +58,22 @@ const GradingViaAerea = () => {
     })
   }
 
+  const toggleConfirm = (file) => {
+    const key = `${selectedGroup}_${file}`
+    setGrades(prev => {
+      const current = prev[key] || {}
+      const updated = {
+        ...prev,
+        [key]: {
+          ...current,
+          confirmed: !current.confirmed
+        }
+      }
+      localStorage.setItem('grades_via_aerea', JSON.stringify(updated))
+      return updated
+    })
+  }
+
   const exportCSV = () => {
     if (Object.keys(grades).length === 0) {
       alert("No hay calificaciones para exportar.")
@@ -65,16 +81,19 @@ const GradingViaAerea = () => {
     }
 
     let csvContent = "data:text/csv;charset=utf-8,"
-    csvContent += "Grupo,Archivo Estudiante,Puntaje Total\n"
+    csvContent += "Grupo,Archivo Estudiante,Puntaje Total,Estado\n"
 
     Object.entries(grades).forEach(([key, fileGrades]) => {
       const [group, ...nameParts] = key.split('_')
       const name = nameParts.join('_')
       
       let total = 0
-      Object.values(fileGrades).forEach(val => { total += val })
+      Object.entries(fileGrades).forEach(([k, val]) => {
+        if (typeof val === 'number') total += val
+      })
       
-      csvContent += `"${group}","${name}",${total}\n`
+      const estado = fileGrades.confirmed ? "Confirmado" : "Pendiente"
+      csvContent += `"${group}","${name}",${total},"${estado}"\n`
     })
 
     const encodedUri = encodeURI(csvContent)
@@ -106,7 +125,9 @@ const GradingViaAerea = () => {
     const fileGrades = grades[`${selectedGroup}_${file}`]
     if (!fileGrades) return 0;
     let total = 0;
-    Object.values(fileGrades).forEach(s => total += s);
+    Object.entries(fileGrades).forEach(([k, val]) => {
+      if (typeof val === 'number') total += val
+    })
     return total;
   }
 
@@ -114,7 +135,21 @@ const GradingViaAerea = () => {
     if (activeRubric.length === 0) return false;
     const fileGrades = grades[`${selectedGroup}_${file}`]
     if (!fileGrades) return false;
-    return Object.keys(fileGrades).length === activeRubric.length;
+    
+    // Contar cuántos de los criterios numéricos están llenos
+    const gradedCount = Object.keys(fileGrades).filter(k => !isNaN(k)).length;
+    return gradedCount === activeRubric.length;
+  }
+
+  const isFileConfirmed = (file) => {
+    return grades[`${selectedGroup}_${file}`]?.confirmed || false;
+  }
+
+  // Calcular progreso del grupo (de 0 a 100)
+  const getGroupProgress = () => {
+    if (groupFiles.length === 0) return 0;
+    const confirmedCount = groupFiles.filter(file => isFileConfirmed(file)).length;
+    return Math.round((confirmedCount / groupFiles.length) * 100);
   }
 
   // Verificar si un grupo tiene todos sus archivos completamente calificados
@@ -128,7 +163,8 @@ const GradingViaAerea = () => {
     return files.every(file => {
       const fileGrades = grades[`${group}_${file}`];
       if (!fileGrades) return false;
-      return Object.keys(fileGrades).length === rubricLength;
+      const gradedCount = Object.keys(fileGrades).filter(k => !isNaN(k)).length;
+      return gradedCount === rubricLength && fileGrades.confirmed;
     });
   }
 
@@ -186,41 +222,64 @@ const GradingViaAerea = () => {
           
           {selectedGroup && groupFiles.length > 0 ? (
             <div className="flex flex-col h-full animate-fade-in">
-              <div className="flex justify-between items-center pb-4 mb-4 border-b border-white/10">
-                <div>
-                  <h2 className="text-2xl font-black text-white">{selectedGroup}</h2>
-                  <p className="text-text-secondary text-sm">{groupFiles.length} imágenes para calificar en este equipo</p>
-                </div>
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-4 bg-slate-900 px-5 py-2 rounded-2xl border border-white/10 shadow-xl">
-                    <button 
-                      onClick={prevPage} 
-                      disabled={currentPage === 0}
-                      className="text-white hover:text-accent-primary disabled:text-slate-600 disabled:cursor-not-allowed transition-colors p-1"
-                    >
-                      <ChevronLeft size={28} />
-                    </button>
-                    <span className="font-mono text-base font-bold text-center">
-                      Pág {currentPage + 1} de {totalPages}
-                    </span>
-                    <button 
-                      onClick={nextPage} 
-                      disabled={currentPage === totalPages - 1}
-                      className="text-white hover:text-accent-primary disabled:text-slate-600 disabled:cursor-not-allowed transition-colors p-1"
-                    >
-                      <ChevronRight size={28} />
-                    </button>
+              <div className="pb-4 mb-4 border-b border-white/10">
+                <div className="flex justify-between items-end mb-2">
+                  <div>
+                    <h2 className="text-2xl font-black text-white">{selectedGroup}</h2>
+                    <p className="text-text-secondary text-sm">{groupFiles.length} imágenes enviadas por este equipo</p>
                   </div>
-                )}
+                  <div className="text-right">
+                    <span className="text-[10px] font-bold text-accent-primary uppercase tracking-widest">Progreso del Grupo</span>
+                    <div className="text-xl font-mono font-black text-white">{getGroupProgress()}%</div>
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5 shadow-inner p-[2px]">
+                   <div 
+                     className="h-full bg-gradient-to-r from-accent-primary to-accent-secondary rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(56,189,248,0.5)]"
+                     style={{ width: `${getGroupProgress()}%` }}
+                   />
+                </div>
+
+                <div className="flex justify-between items-center mt-4">
+                   <div className="text-xs text-text-secondary flex gap-4">
+                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-success"></div> Confirmadas</span>
+                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-700"></div> Pendientes</span>
+                   </div>
+                   {totalPages > 1 && (
+                    <div className="flex items-center gap-4 bg-slate-900 px-5 py-2 rounded-2xl border border-white/10 shadow-xl">
+                      <button 
+                        onClick={prevPage} 
+                        disabled={currentPage === 0}
+                        className="text-white hover:text-accent-primary disabled:text-slate-600 disabled:cursor-not-allowed transition-colors p-1"
+                      >
+                        <ChevronLeft size={28} />
+                      </button>
+                      <span className="font-mono text-base font-bold text-center">
+                         Pág {currentPage + 1} de {totalPages}
+                      </span>
+                      <button 
+                        onClick={nextPage} 
+                        disabled={currentPage === totalPages - 1}
+                        className="text-white hover:text-accent-primary disabled:text-slate-600 disabled:cursor-not-allowed transition-colors p-1"
+                      >
+                        <ChevronRight size={28} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
                
               <div className="flex-1 overflow-y-auto pr-2 pb-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 {currentImages.map((file) => {
+                  const confirmed = isFileConfirmed(file);
                   const currentlyGraded = isFileFullyGraded(file);
                   const totalFileScore = getFileTotal(file);
                   
                   return (
-                  <div key={file} className="bg-slate-900 rounded-2xl overflow-hidden border border-white/10 flex flex-col shadow-2xl">
+                  <div key={file} className={`bg-slate-900 rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col shadow-2xl ${
+                    confirmed ? 'border-success ring-1 ring-success/20' : 'border-white/10'
+                  }`}>
                     
                     {/* Header Image */}
                     <div className="p-3 bg-slate-800 text-xs text-text-secondary flex justify-between items-center border-b border-white/5">
@@ -335,15 +394,23 @@ const GradingViaAerea = () => {
 
                       {/* Score Summary Footer */}
                       <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
-                        <div className="flex items-center gap-2">
-                           {currentlyGraded ? (
-                             <span className="flex items-center gap-1.5 text-success font-bold text-sm bg-success/10 px-3 py-1.5 rounded-lg border border-success/20">
-                               <Check size={16}/> Comprobado
-                             </span>
-                           ) : (
-                             <span className="text-xs text-warning/80 italic">Aún faltan criterios...</span>
-                           )}
-                        </div>
+                         <div className="flex items-center gap-2">
+                            <button 
+                              onClick={() => toggleConfirm(file)}
+                              disabled={!currentlyGraded}
+                              className={`px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2 transition-all ${
+                                confirmed
+                                ? 'bg-success text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
+                                : 'bg-accent-primary/20 text-accent-primary hover:bg-accent-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
+                              }`}
+                            >
+                              {confirmed ? <CheckCircle size={14}/> : <Check size={14}/>}
+                              {confirmed ? 'Nota Confirmada' : 'Confirmar Nota'}
+                            </button>
+                            {!currentlyGraded && (
+                               <span className="text-[9px] text-warning/80 italic leading-tight">Completa la rúbrica<br/>para confirmar</span>
+                            )}
+                         </div>
                         <div className="text-right flex items-center gap-2">
                           <span className="text-[10px] text-text-secondary uppercase font-bold tracking-wider">Puntaje</span>
                           <span className="text-2xl font-mono font-black text-accent-primary drop-shadow-[0_0_10px_rgba(34,211,238,0.3)]">
