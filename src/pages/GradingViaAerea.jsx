@@ -278,21 +278,42 @@ const GradingViaAerea = () => {
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 1)}
-                                   className={`p-1.5 border-r border-white/5 cursor-pointer align-top transition-colors ${isFull ? 'bg-success/20 text-success font-semibold ring-1 ring-inset ring-success' : 'text-text-secondary hover:bg-slate-800'}`}
+                                   className={`p-2 border-r border-white/10 cursor-pointer align-top transition-all relative ${
+                                     isFull 
+                                     ? 'bg-green-600 text-white font-bold shadow-inner' 
+                                     : 'text-text-secondary hover:bg-slate-800'
+                                   }`}
                                  >
-                                   {item["Completo (1 pto.)"]}
+                                   <div className="flex flex-col gap-1">
+                                     {isFull && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {item["Completo (1 pto.)"]}
+                                   </div>
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 0.5)}
-                                   className={`p-1.5 border-r border-white/5 cursor-pointer align-top transition-colors ${isHalf ? 'bg-warning/20 text-warning font-semibold ring-1 ring-inset ring-warning' : 'text-text-secondary hover:bg-slate-800'}`}
+                                   className={`p-2 border-r border-white/10 cursor-pointer align-top transition-all relative ${
+                                     isHalf 
+                                     ? 'bg-amber-500 text-white font-bold shadow-inner' 
+                                     : 'text-text-secondary hover:bg-slate-800'
+                                   }`}
                                  >
-                                   {item["Faltan elementos (0.5 ptos.)"]}
+                                   <div className="flex flex-col gap-1">
+                                     {isHalf && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {item["Faltan elementos (0.5 ptos.)"]}
+                                   </div>
                                  </td>
                                  <td 
                                    onClick={() => handleScoreChange(file, idx, 0)}
-                                   className={`p-1.5 cursor-pointer align-top transition-colors ${isZero ? 'bg-error/20 text-error font-semibold ring-1 ring-inset ring-error' : 'text-text-secondary hover:bg-slate-800'}`}
+                                   className={`p-2 cursor-pointer align-top transition-all relative ${
+                                     isZero 
+                                     ? 'bg-red-600 text-white font-bold shadow-inner' 
+                                     : 'text-text-secondary hover:bg-slate-800'
+                                   }`}
                                  >
-                                   {item["Incompleto (0 ptos.)"]}
+                                   <div className="flex flex-col gap-1">
+                                     {isZero && <div className="flex items-center gap-1 text-[10px] bg-white/20 px-1 rounded w-fit mb-1"><Check size={8}/> Seleccionado</div>}
+                                     {item["Incompleto (0 ptos.)"]}
+                                   </div>
                                  </td>
                                </tr>
                              )
