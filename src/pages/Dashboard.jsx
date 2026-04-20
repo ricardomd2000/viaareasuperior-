@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import { Play, CheckCircle, Clock, BookOpen, Layers, ClipboardList } from 'lucide-react'
+import { Play, CheckCircle, Clock, BookOpen, Layers, ClipboardList, Activity } from 'lucide-react'
 
 const Dashboard = () => {
   const { user, studentSession, isTeacher, loading: authLoading } = useAuth()
