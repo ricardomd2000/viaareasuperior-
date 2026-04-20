@@ -233,18 +233,27 @@ const GradingViaAerea = () => {
                     <div className="text-xl font-mono font-black text-white">{getGroupProgress()}%</div>
                   </div>
                 </div>
-                {/* Progress Bar */}
-                <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-white/5 shadow-inner p-[2px]">
+                {/* Progress Bar Container */}
+                <div style={{ backgroundColor: '#1e293b', height: '22px', borderRadius: '11px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', position: 'relative', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.3)' }}>
                    <div 
-                     className="h-full bg-gradient-to-r from-accent-primary to-accent-secondary rounded-full transition-all duration-700 ease-out shadow-[0_0_10px_rgba(56,189,248,0.5)]"
-                     style={{ width: `${getGroupProgress()}%` }}
+                     style={{ 
+                       width: `${getGroupProgress()}%`, 
+                       height: '100%', 
+                       background: 'linear-gradient(90deg, #38bdf8 0%, #3b82f6 100%)',
+                       boxShadow: '0 0 15px rgba(56, 189, 248, 0.6)',
+                       transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)',
+                       borderRadius: '11px'
+                     }}
                    />
+                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', fontWeight: '900', color: 'white', textShadow: '0 1px 2px rgba(0,0,0,0.5)' }}>
+                      AVANCE TOTAL DEL EQUIPO: {getGroupProgress()}%
+                   </div>
                 </div>
 
                 <div className="flex justify-between items-center mt-4">
                    <div className="text-xs text-text-secondary flex gap-4">
-                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-success"></div> Confirmadas</span>
-                     <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-slate-700"></div> Pendientes</span>
+                     <span className="flex items-center gap-1"><div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#22c55e', boxShadow: '0 0 8px #22c55e' }}></div> Confirmadas</span>
+                     <span className="flex items-center gap-1"><div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#334155' }}></div> Pendientes</span>
                    </div>
                    {totalPages > 1 && (
                     <div className="flex items-center gap-4 bg-slate-900 px-5 py-2 rounded-2xl border border-white/10 shadow-xl">
@@ -277,9 +286,15 @@ const GradingViaAerea = () => {
                   const totalFileScore = getFileTotal(file);
                   
                   return (
-                  <div key={file} className={`bg-slate-900 rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col shadow-2xl ${
-                    confirmed ? 'border-success ring-1 ring-success/20' : 'border-white/10'
-                  }`}>
+                  <div key={file} 
+                    style={{ 
+                      borderColor: confirmed ? '#22c55e' : 'rgba(255,255,255,0.1)',
+                      borderStyle: 'solid',
+                      borderWidth: confirmed ? '3px' : '1px',
+                      boxShadow: confirmed ? '0 0 30px rgba(34,197,94,0.15)' : '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+                    }}
+                    className="bg-slate-900 rounded-2xl overflow-hidden transition-all duration-300 flex flex-col shadow-2xl"
+                  >
                     
                     {/* Header Image */}
                     <div className="p-3 bg-slate-800 text-xs text-text-secondary flex justify-between items-center border-b border-white/5">
@@ -394,21 +409,35 @@ const GradingViaAerea = () => {
 
                       {/* Score Summary Footer */}
                       <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
-                         <div className="flex items-center gap-2">
+                         <div className="flex items-center gap-3">
                             <button 
                               onClick={() => toggleConfirm(file)}
                               disabled={!currentlyGraded}
-                              className={`px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-2 transition-all ${
-                                confirmed
-                                ? 'bg-success text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-                                : 'bg-accent-primary/20 text-accent-primary hover:bg-accent-primary hover:text-white disabled:opacity-30 disabled:cursor-not-allowed'
-                              }`}
+                              style={{
+                                backgroundColor: confirmed ? '#22c55e' : (currentlyGraded ? '#0ea5e9' : '#1e293b'),
+                                color: confirmed || currentlyGraded ? 'white' : '#64748b',
+                                border: confirmed ? '2px solid white' : 'none',
+                                boxShadow: confirmed ? '0 0 20px rgba(34,197,94,0.5)' : (currentlyGraded ? '0 4px 12px rgba(14,165,233,0.3)' : 'none'),
+                                cursor: currentlyGraded ? 'pointer' : 'not-allowed',
+                                padding: '12px 24px',
+                                borderRadius: '12px',
+                                fontSize: '11px',
+                                fontWeight: '900',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                transform: confirmed ? 'scale(1.02)' : 'scale(1)',
+                                letterSpacing: '0.05em'
+                              }}
                             >
-                              {confirmed ? <CheckCircle size={14}/> : <Check size={14}/>}
-                              {confirmed ? 'Nota Confirmada' : 'Confirmar Nota'}
+                              {confirmed ? <CheckCircle size={18}/> : <Check size={18}/>}
+                              {confirmed ? 'NOTA CONFIRMADA' : 'CONFIRMAR EVALUACIÓN'}
                             </button>
                             {!currentlyGraded && (
-                               <span className="text-[9px] text-warning/80 italic leading-tight">Completa la rúbrica<br/>para confirmar</span>
+                               <div style={{ color: '#f59e0b', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase', lineHeight: '1.2' }}>
+                                 Faltan criterios<br/>por evaluar
+                               </div>
                             )}
                          </div>
                         <div className="text-right flex items-center gap-2">
