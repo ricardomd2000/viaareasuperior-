@@ -21,10 +21,11 @@ const GradingViaAerea = () => {
   const [currentGrades, setCurrentGrades] = useState({})
 
   useEffect(() => {
-    // Load from public folder
+    // Load from public folder with cache busting
+    const ts = new Date().getTime();
     Promise.all([
-      fetch('/eval_index.json').then(res => res.json()).catch(() => ({})),
-      fetch('/rubrics.json').then(res => res.json()).catch(() => ({}))
+      fetch(`/eval_index.json?t=${ts}`).then(res => res.json()).catch(() => ({})),
+      fetch(`/rubrics.json?t=${ts}`).then(res => res.json()).catch(() => ({}))
     ]).then(([index, rubricsData]) => {
       setIndexData(index)
       setRubrics(rubricsData)
