@@ -252,43 +252,56 @@ const GradingViaAerea = () => {
                          />
                       )}
                     </div>
-                    
-                    {/* Dropdown Rubric for the specific image */}
-                    <div className="p-5 flex flex-col gap-4">
-                      {activeRubric.map((item, idx) => {
-                         const currentVal = grades[`${selectedGroup}_${file}`]?.[idx];
-                         // Color coding for dropdown
-                         let selectBg = 'bg-slate-800 border-white/20';
-                         if (currentVal === 1) selectBg = 'bg-success/20 border-success/50 text-success font-bold';
-                         else if (currentVal === 0.5) selectBg = 'bg-warning/20 border-warning/50 text-warning font-bold';
-                         else if (currentVal === 0) selectBg = 'bg-error/20 border-error/50 text-error font-bold';
-
-                         return (
-                           <div key={idx} className="flex justify-between items-center gap-4">
-                             <div className="flex-1 min-w-0 pr-4">
-                               <h4 className="text-sm font-semibold truncate" title={item["Criterio de Evaluación"]}>
-                                 {item["Criterio de Evaluación"]}
-                               </h4>
-                             </div>
+                            {/* Interactive Table Rubric for the specific image */}
+                    <div className="p-3">
+                      <table className="w-full text-left border-collapse border border-white/5 bg-slate-900 shadow-lg">
+                        <thead className="bg-slate-800 text-[10px] text-text-secondary uppercase">
+                          <tr>
+                            <th className="p-2 border border-white/10 w-[20%]">Criterio</th>
+                            <th className="p-2 border border-white/10 w-[26%] text-center leading-tight">Completo<br/>(1.0)</th>
+                            <th className="p-2 border border-white/10 w-[26%] text-center leading-tight">Faltan<br/>(0.5)</th>
+                            <th className="p-2 border border-white/10 w-[26%] text-center leading-tight">Incompleto<br/>(0.0)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-[10px]">
+                          {activeRubric.map((item, idx) => {
+                             const currentVal = grades[`${selectedGroup}_${file}`]?.[idx];
                              
-                             <div className="w-[200px] flex-shrink-0">
-                               <select 
-                                 className={`w-full appearance-none outline-none py-2 px-3 rounded-lg text-sm transition-colors cursor-pointer border ${selectBg}`}
-                                 value={currentVal !== undefined ? currentVal : ""}
-                                 onChange={(e) => handleScoreChange(file, idx, parseFloat(e.target.value))}
-                               >
-                                 <option value="" disabled className="text-white bg-slate-900">Seleccionar nota...</option>
-                                 <option value="1" className="text-white bg-slate-900">Completo (1.0 pt)</option>
-                                 <option value="0.5" className="text-white bg-slate-900">Falta elem. (0.5 pt)</option>
-                                 <option value="0" className="text-white bg-slate-900">Incompleto (0.0 pt)</option>
-                               </select>
-                             </div>
-                           </div>
-                         )
-                      })}
+                             const isFull = currentVal === 1;
+                             const isHalf = currentVal === 0.5;
+                             const isZero = currentVal === 0;
+
+                             return (
+                               <tr key={idx} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                 <td className="p-1.5 border-r border-white/5 font-bold text-slate-300 align-top">
+                                   {item["Criterio de Evaluación"]}
+                                 </td>
+                                 <td 
+                                   onClick={() => handleScoreChange(file, idx, 1)}
+                                   className={`p-1.5 border-r border-white/5 cursor-pointer align-top transition-colors ${isFull ? 'bg-success/20 text-success font-semibold ring-1 ring-inset ring-success' : 'text-text-secondary hover:bg-slate-800'}`}
+                                 >
+                                   {item["Completo (1 pto.)"]}
+                                 </td>
+                                 <td 
+                                   onClick={() => handleScoreChange(file, idx, 0.5)}
+                                   className={`p-1.5 border-r border-white/5 cursor-pointer align-top transition-colors ${isHalf ? 'bg-warning/20 text-warning font-semibold ring-1 ring-inset ring-warning' : 'text-text-secondary hover:bg-slate-800'}`}
+                                 >
+                                   {item["Faltan elementos (0.5 ptos.)"]}
+                                 </td>
+                                 <td 
+                                   onClick={() => handleScoreChange(file, idx, 0)}
+                                   className={`p-1.5 cursor-pointer align-top transition-colors ${isZero ? 'bg-error/20 text-error font-semibold ring-1 ring-inset ring-error' : 'text-text-secondary hover:bg-slate-800'}`}
+                                 >
+                                   {item["Incompleto (0 ptos.)"]}
+                                 </td>
+                               </tr>
+                             )
+                          })}
+                        </tbody>
+                      </table>
 
                       {/* Score Summary Footer */}
-                      <div className="flex justify-between items-center mt-3 pt-4 border-t border-white/10">
+                      <div className="flex justify-between items-center mt-3 pt-3 border-t border-white/10">
                         <div className="flex items-center gap-2">
                            {currentlyGraded ? (
                              <span className="flex items-center gap-1.5 text-success font-bold text-sm bg-success/10 px-3 py-1.5 rounded-lg border border-success/20">
